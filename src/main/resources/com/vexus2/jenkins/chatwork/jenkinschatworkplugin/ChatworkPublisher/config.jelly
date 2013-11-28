@@ -1,0 +1,20 @@
+<j:jelly xmlns:j="jelly:core"
+         xmlns:st="jelly:stapler"
+         xmlns:d="jelly:define"
+         xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson"
+         xmlns:f="/lib/form">
+    <f:entry
+            title="Chatwork Room ID"
+            field="rid"
+            description="Set Room ID you want to notice">
+        <f:textbox/>
+    </f:entry>
+    <f:advanced>
+        <f:entry
+                title="Default message"
+                field="default_message">
+            <f:textarea/>
+        </f:entry>
+    </f:advanced>
+</j:jelly>
