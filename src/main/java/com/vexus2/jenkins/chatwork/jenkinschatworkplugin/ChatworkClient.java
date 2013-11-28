@@ -17,19 +17,22 @@ import java.util.Set;
 
 public class ChatworkClient {
 
-  public final String API_KEY;
+  private final String API_KEY;
 
-  public final String CHANNEL_ID;
+  private final String CHANNEL_ID;
 
-  public final AbstractBuild BUILD;
+  private final AbstractBuild BUILD;
+
+  private final String DEFAULT_MESSAGE;
 
   public static final String API_URL = "https://api.chatwork.com/v1";
 
 
-  public ChatworkClient(AbstractBuild build, String apiKey, String channelId) {
+  public ChatworkClient(AbstractBuild build, String apiKey, String channelId, String defaultMessage) {
     this.BUILD = build;
     this.API_KEY = apiKey;
     this.CHANNEL_ID = channelId;
+    this.DEFAULT_MESSAGE = defaultMessage;
   }
 
   public boolean sendMessage() throws Exception {
@@ -46,7 +49,7 @@ public class ChatworkClient {
     con.setRequestMethod("POST");
     con.setRequestProperty("X-ChatWorkToken", this.API_KEY);
 
-    String urlParameters = "data=" + message;
+    String urlParameters = "data=" + DEFAULT_MESSAGE + message;
 
     con.setDoOutput(true);
     DataOutputStream wr = new DataOutputStream(con.getOutputStream());

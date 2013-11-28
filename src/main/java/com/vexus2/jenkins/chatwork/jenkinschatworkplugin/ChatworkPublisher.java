@@ -15,11 +15,13 @@ import org.kohsuke.stapler.StaplerRequest;
 public class ChatworkPublisher extends Publisher {
 
   private final String rid;
+  private final String defaultMessage;
 
   // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
   @DataBoundConstructor
-  public ChatworkPublisher(String rid) {
+  public ChatworkPublisher(String rid, String defaultMessage) {
     this.rid = rid;
+    this.defaultMessage = (defaultMessage != null) ? defaultMessage : "";
   }
 
   /**
@@ -29,12 +31,16 @@ public class ChatworkPublisher extends Publisher {
     return rid;
   }
 
+  public String getDefaultMessage() {
+    return defaultMessage;
+  }
+
   @Override
   public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
 
     Boolean result = true;
     try {
-      ChatworkClient chatworkClient = new ChatworkClient(build, getDescriptor().getApikey(), getRid());
+      ChatworkClient chatworkClient = new ChatworkClient(build, getDescriptor().getApikey(), getRid(), getDefaultMessage());
       chatworkClient.sendMessage();
     }catch (Exception e) {
       result = false;
