@@ -26,4 +26,10 @@
     </pluginRepository>
   </pluginRepositories>
 
+   <scm>
+     <connection>scm:git:ssh://github.com/jenkinsci/chatwork-plugin.git</connection>
+     <developerConnection>scm:git:ssh://git@github.com/jenkinsci/chatwork-plugin.git</developerConnection>
+     <url>https://github.com/jenkinsci/chatwork-plugin.git</url>
+   </scm>
+
 </project>
