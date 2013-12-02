@@ -42,31 +42,32 @@ public class ChatworkClient {
 
     String message = createMessage();
 
-    String url = new StringBuffer(API_URL).append("/").append(this.CHANNEL_ID).append("/messages").toString();
+    String url = API_URL + "/rooms/" + this.CHANNEL_ID + "/messages";
     URL obj = new URL(url);
     HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
     con.setRequestMethod("POST");
     con.setRequestProperty("X-ChatWorkToken", this.API_KEY);
+    con.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
 
-    String urlParameters = "data=" + DEFAULT_MESSAGE + message;
+    String urlParameters = "body=" + DEFAULT_MESSAGE + message;
 
     con.setDoOutput(true);
     DataOutputStream wr = new DataOutputStream(con.getOutputStream());
     wr.writeBytes(urlParameters);
     wr.flush();
     wr.close();
+    con.connect();
 
     int responseCode = con.getResponseCode();
-    if(responseCode != 200) {
-      throw new Exception("Response is not valid. Check your API Key or Chatwork API status. response_code = " + responseCode);
+    if (responseCode != 200) {
+      throw new Exception("Response is not valid. Check your API Key or Chatwork API status. response_code = " + responseCode + ", message = " + con.getResponseMessage());
     }
-    System.out.println("Response Code : " + responseCode);
 
     BufferedReader in = new BufferedReader(
         new InputStreamReader(con.getInputStream()));
     String inputLine;
-    StringBuffer response = new StringBuffer();
+    StringBuilder response = new StringBuilder();
 
     while ((inputLine = in.readLine()) != null) {
       response.append(inputLine);
@@ -77,14 +78,14 @@ public class ChatworkClient {
   }
 
   private String createMessage() throws Exception {
-    StringBuffer message = new StringBuffer();
+    StringBuilder message = new StringBuilder();
     String changes = getChanges();
     CauseAction cause = this.BUILD.getAction(CauseAction.class);
 
     if (changes != null) {
-      message.append(changes + "¥n");
+      message.append(changes);
     } else if (cause != null) {
-      message.append(cause + "¥n");
+      message.append(cause);
     }
 
     return message.toString();
@@ -109,7 +110,7 @@ public class ChatworkClient {
       }
     }
 
-    StringBuffer message = new StringBuffer();
+    StringBuilder message = new StringBuilder();
     message.append("Started by changes from ");
     message.append(StringUtils.join(authors, ", "));
     message.append(" (");

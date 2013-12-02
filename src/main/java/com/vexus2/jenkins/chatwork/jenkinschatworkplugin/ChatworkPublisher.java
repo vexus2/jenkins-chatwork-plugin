@@ -21,6 +21,7 @@ public class ChatworkPublisher extends Publisher {
   @DataBoundConstructor
   public ChatworkPublisher(String rid, String defaultMessage) {
     this.rid = rid;
+
     this.defaultMessage = (defaultMessage != null) ? defaultMessage : "";
   }
 
@@ -85,7 +86,7 @@ public class ChatworkPublisher extends Publisher {
     }
 
     public String getDisplayName() {
-      return "Jenkins Chatwork Plugin";
+      return "Notify the ChatWork";
     }
 
     @Override
