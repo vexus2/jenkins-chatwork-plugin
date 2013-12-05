@@ -2,5 +2,5 @@
   This view is used to render the installed plugins page.
 -->
 <div>
-  プラグインの説明文 あとで説明文考える
+  This plugin will notify the ChatWork the start of Job.
 </div>
