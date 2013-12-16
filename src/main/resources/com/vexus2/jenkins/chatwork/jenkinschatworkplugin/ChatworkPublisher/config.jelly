@@ -10,11 +10,9 @@
             description="Set Room ID you want to notice">
         <f:textbox/>
     </f:entry>
-    <f:advanced>
-        <f:entry
-                title="Default message"
-                field="defaultMessage">
-            <f:textarea/>
-        </f:entry>
-    </f:advanced>
+    <f:entry
+            title="Default message"
+            field="defaultMessage">
+        <f:textarea/>
+    </f:entry>
 </j:jelly>

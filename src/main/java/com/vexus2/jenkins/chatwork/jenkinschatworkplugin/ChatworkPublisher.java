@@ -9,8 +9,6 @@ import hudson.tasks.Publisher;
 import hudson.util.VariableResolver;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
-import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -50,16 +48,6 @@ public class ChatworkPublisher extends Publisher {
 
   @Override
   public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
-
-    try {
-      String expandedLabel = TokenMacro.expandAll(build, listener, "perform");
-    } catch (MacroEvaluationException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
     Boolean result = true;
     this.build = build;
