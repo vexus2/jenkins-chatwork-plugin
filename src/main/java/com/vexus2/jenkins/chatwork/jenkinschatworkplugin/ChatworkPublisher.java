@@ -56,6 +56,8 @@ public class ChatworkPublisher extends Publisher {
 
       String message = createMessage();
 
+      if (message == null) return false;
+
       ChatworkClient chatworkClient = new ChatworkClient(build, getDescriptor().getApikey(), getRid(), getDefaultMessage());
       chatworkClient.sendMessage(message);
     } catch (Exception e) {
@@ -95,7 +97,6 @@ public class ChatworkPublisher extends Publisher {
 
     JSONObject json = JSONObject.fromObject(parameterDefinition);
 
-    //TODO: 設定画面で表示したい項目を選べるようにする
     String action = json.getString("action");
     StringBuilder message;
     if (action != null && "opened".equals(action)) {
@@ -105,12 +106,14 @@ public class ChatworkPublisher extends Publisher {
       String repositoryName = json.getJSONObject("repository").getString("name");
       String pusher = pull_request.getJSONObject("user").getString("login");
 
-      message = new StringBuilder().append(String.format("%s created Pull Request into %s,\n\n", pusher, repositoryName));
+      message = new StringBuilder().append(String.format("%s created Pull Request into %s,\n", pusher, repositoryName));
       message.append(String.format("\n%s", title));
       message.append(String.format("\n%s", url));
     } else {
 
       String compareUrl = json.getString("compare");
+      if (compareUrl == null) return null;
+
       String pusher = json.getJSONObject("pusher").getString("name");
       String repositoryName = json.getJSONObject("repository").getString("name");
       message = new StringBuilder().append(String.format("%s pushed into %s,\n", pusher, repositoryName));
