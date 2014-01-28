@@ -96,25 +96,38 @@ public class ChatworkPublisher extends Publisher {
     JSONObject json = JSONObject.fromObject(parameterDefinition);
 
     //TODO: 設定画面で表示したい項目を選べるようにする
-    String compareUrl = json.getString("compare");
-    String pusher = json.getJSONObject("pusher").getString("name");
-    String repositoryName = json.getJSONObject("repository").getString("name");
+    String action = json.getString("action");
+    StringBuilder message;
+    if (action != null && "opened".equals(action)) {
+      JSONObject pull_request = json.getJSONObject("pull_request");
+      String title = pull_request.getString("title");
+      String url = pull_request.getString("url");
+      String repositoryName = json.getJSONObject("repository").getString("name");
+      String pusher = pull_request.getJSONObject("user").getString("login");
 
+      message = new StringBuilder().append(String.format("%s created Pull Request into %s,\n\n", pusher, repositoryName));
+      message.append(String.format("\n%s", title));
+      message.append(String.format("\n%s", url));
+    } else {
 
-    StringBuilder message = new StringBuilder().append(String.format("%s pushed into %s,\n\n", pusher, repositoryName));
+      String compareUrl = json.getString("compare");
+      String pusher = json.getJSONObject("pusher").getString("name");
+      String repositoryName = json.getJSONObject("repository").getString("name");
+      message = new StringBuilder().append(String.format("%s pushed into %s,\n", pusher, repositoryName));
 
-    JSONArray commits = json.getJSONArray("commits");
-    int size = commits.size();
-    for (int i = 0; i < size; i++) {
-      JSONObject value = (JSONObject) commits.get(i);
-      // コミットメッセージが長くなりすぎることを考慮して文字長を50文字とする
-      String s = value.getString("message");
-      message.append(String.format("- %s \n", (s.length() > 50) ? s.substring(0, 50) + "..." : s));
+      JSONArray commits = json.getJSONArray("commits");
+      int size = commits.size();
+      for (int i = 0; i < size; i++) {
+        JSONObject value = (JSONObject) commits.get(i);
+        // コミットメッセージが長くなりすぎることを考慮して文字長を50文字とする
+        String s = value.getString("message");
+        message.append(String.format("- %s \n", (s.length() > 50) ? s.substring(0, 50) + "..." : s));
+      }
+      message.append(String.format("\n%s", compareUrl));
+
     }
 
-    message.append(String.format("\n%s", compareUrl));
     return message.toString();
-
   }
 
   @Override
