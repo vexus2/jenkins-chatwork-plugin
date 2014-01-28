@@ -12,8 +12,6 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,8 +22,6 @@ public class ChatworkPublisher extends Publisher {
 
   private static final Pattern pattern = Pattern.compile("\\$\\{(.+)\\}|\\$(.+)\\s?");
   private AbstractBuild build;
-  //TODO:
-  private PrintStream logger;
 
   // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
   @DataBoundConstructor
@@ -51,7 +47,6 @@ public class ChatworkPublisher extends Publisher {
 
     Boolean result = true;
     this.build = build;
-    this.logger = listener.getLogger();
     try {
 
       String message = createMessage();
@@ -97,9 +92,8 @@ public class ChatworkPublisher extends Publisher {
 
     JSONObject json = JSONObject.fromObject(parameterDefinition);
 
-    String action = json.getString("action");
     StringBuilder message;
-    if (action != null && "opened".equals(action)) {
+    if (json.has("action") && "opened".equals(json.getString("action"))) {
       JSONObject pull_request = json.getJSONObject("pull_request");
       String title = pull_request.getString("title");
       String url = pull_request.getString("url");
@@ -111,8 +105,8 @@ public class ChatworkPublisher extends Publisher {
       message.append(String.format("\n%s", url));
     } else {
 
+      if (!json.has("compare")) return null;
       String compareUrl = json.getString("compare");
-      if (compareUrl == null) return null;
 
       String pusher = json.getJSONObject("pusher").getString("name");
       String repositoryName = json.getJSONObject("repository").getString("name");
