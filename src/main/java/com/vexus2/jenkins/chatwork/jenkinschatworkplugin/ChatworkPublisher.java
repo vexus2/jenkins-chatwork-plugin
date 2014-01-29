@@ -96,7 +96,7 @@ public class ChatworkPublisher extends Publisher {
     if (json.has("action") && "opened".equals(json.getString("action"))) {
       JSONObject pull_request = json.getJSONObject("pull_request");
       String title = pull_request.getString("title");
-      String url = pull_request.getString("url");
+      String url = pull_request.getString("html_url");
       String repositoryName = json.getJSONObject("repository").getString("name");
       String pusher = pull_request.getJSONObject("user").getString("login");
 
