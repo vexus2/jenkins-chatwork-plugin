@@ -15,4 +15,14 @@
             field="defaultMessage">
         <f:textarea/>
     </f:entry>
+    <f:entry
+            title="notify on build success"
+            field="notifyOnSuccess">
+        <f:checkbox/>
+    </f:entry>
+    <f:entry
+            title="notify on build fail"
+            field="notifyOnFail">
+        <f:checkbox/>
+    </f:entry>
 </j:jelly>

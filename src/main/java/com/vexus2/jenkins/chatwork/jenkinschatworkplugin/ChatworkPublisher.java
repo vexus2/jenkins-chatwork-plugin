@@ -20,14 +20,17 @@ public class ChatworkPublisher extends Publisher {
   private final String rid;
   private final String defaultMessage;
 
+  private Boolean notifyOnSuccess;
+  private Boolean notifyOnFail;
   private static final Pattern pattern = Pattern.compile("\\$\\{(.+)\\}|\\$(.+)\\s?");
   private AbstractBuild build;
 
   // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
   @DataBoundConstructor
-  public ChatworkPublisher(String rid, String defaultMessage) {
+  public ChatworkPublisher(String rid, String defaultMessage, Boolean notifyOnSuccess, Boolean notifyOnFail) {
     this.rid = rid;
-
+    this.notifyOnSuccess = notifyOnSuccess;
+    this.notifyOnFail = notifyOnFail;
     this.defaultMessage = (defaultMessage != null) ? defaultMessage : "";
   }
 
@@ -41,12 +44,27 @@ public class ChatworkPublisher extends Publisher {
   public String getDefaultMessage() {
     return defaultMessage;
   }
+  
+  public Boolean getNotifyOnSuccess() {
+    return notifyOnSuccess;
+  }
+
+  public Boolean getNotifyOnFail() {
+    return notifyOnFail;
+  }
 
   @Override
   public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
 
     Boolean result = true;
     this.build = build;
+    
+    if(this.build.getResult() == Result.SUCCESS && !this.notifyOnSuccess) {
+      return true;
+    }
+    if(this.build.getResult() == Result.FAILURE && !this.notifyOnFail) {
+      return true;
+    }
     try {
 
       String message = createMessage();
