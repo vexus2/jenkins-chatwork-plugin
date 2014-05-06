@@ -106,7 +106,7 @@ public class ChatworkPublisher extends Publisher {
     }
   }
 
-  private String analyzePayload(String parameterDefinition) {
+  private static String analyzePayload(String parameterDefinition) {
 
     JSONObject json = JSONObject.fromObject(parameterDefinition);
 
@@ -136,7 +136,7 @@ public class ChatworkPublisher extends Publisher {
         JSONObject value = (JSONObject) commits.get(i);
         // コミットメッセージが長くなりすぎることを考慮して文字長を50文字とする
         String s = value.getString("message");
-        message.append(String.format("- %s \n", (s.length() > 50) ? s.substring(0, 50) + "..." : s));
+        message.append(String.format("- %s\n", (s.length() > 50) ? s.substring(0, 50) + "..." : s));
       }
       message.append(String.format("\n%s", compareUrl));
 
