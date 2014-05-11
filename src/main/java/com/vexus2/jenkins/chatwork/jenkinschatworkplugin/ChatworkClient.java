@@ -1,6 +1,7 @@
 package com.vexus2.jenkins.chatwork.jenkinschatworkplugin;
 
 import hudson.model.AbstractBuild;
+import org.apache.commons.io.IOUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
@@ -43,10 +44,17 @@ public class ChatworkClient {
     String urlParameters = "body=" + message;
 
     con.setDoOutput(true);
+
     DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-    wr.write(urlParameters.getBytes("utf-8"));
-    wr.flush();
-    wr.close();
+    try {
+      wr.write(urlParameters.getBytes("utf-8"));
+      wr.flush();
+
+    } finally {
+      IOUtils.closeQuietly(wr);
+
+    }
+
     con.connect();
 
     int responseCode = con.getResponseCode();
@@ -56,13 +64,18 @@ public class ChatworkClient {
 
     BufferedReader in = new BufferedReader(
         new InputStreamReader(con.getInputStream()));
-    String inputLine;
-    StringBuilder response = new StringBuilder();
+    try {
+      String inputLine;
+      StringBuilder response = new StringBuilder();
 
-    while ((inputLine = in.readLine()) != null) {
-      response.append(inputLine);
+      while ((inputLine = in.readLine()) != null) {
+        response.append(inputLine);
+      }
+
+    } finally {
+      IOUtils.closeQuietly(in);
+
     }
-    in.close();
 
     return true;
   }
