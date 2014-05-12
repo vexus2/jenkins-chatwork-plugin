@@ -2,7 +2,10 @@ package com.vexus2.jenkins.chatwork.jenkinschatworkplugin;
 
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -106,29 +109,29 @@ public class ChatworkPublisher extends Publisher {
     }
   }
 
-  private String analyzePayload(String parameterDefinition) {
+  private static String analyzePayload(String parameterDefinition) {
 
     JSONObject json = JSONObject.fromObject(parameterDefinition);
 
-    StringBuilder message;
     if (json.has("action") && "opened".equals(json.getString("action"))) {
-      JSONObject pull_request = json.getJSONObject("pull_request");
-      String title = pull_request.getString("title");
-      String url = pull_request.getString("html_url");
+      JSONObject pullRequest = json.getJSONObject("pull_request");
+      String title = pullRequest.getString("title");
+      String url = pullRequest.getString("html_url");
       String repositoryName = json.getJSONObject("repository").getString("name");
-      String pusher = pull_request.getJSONObject("user").getString("login");
+      String pusher = pullRequest.getJSONObject("user").getString("login");
 
-      message = new StringBuilder().append(String.format("%s created Pull Request into %s,\n", pusher, repositoryName));
+      StringBuilder message = new StringBuilder().append(String.format("%s created Pull Request into %s,\n", pusher, repositoryName));
       message.append(String.format("\n%s", title));
       message.append(String.format("\n%s", url));
-    } else {
 
-      if (!json.has("compare")) return null;
+      return message.toString();
+
+    } else if(json.has("compare")){
       String compareUrl = json.getString("compare");
 
       String pusher = json.getJSONObject("pusher").getString("name");
       String repositoryName = json.getJSONObject("repository").getString("name");
-      message = new StringBuilder().append(String.format("%s pushed into %s,\n", pusher, repositoryName));
+      StringBuilder message = new StringBuilder().append(String.format("%s pushed into %s,\n", pusher, repositoryName));
 
       JSONArray commits = json.getJSONArray("commits");
       int size = commits.size();
@@ -136,13 +139,14 @@ public class ChatworkPublisher extends Publisher {
         JSONObject value = (JSONObject) commits.get(i);
         // コミットメッセージが長くなりすぎることを考慮して文字長を50文字とする
         String s = value.getString("message");
-        message.append(String.format("- %s \n", (s.length() > 50) ? s.substring(0, 50) + "..." : s));
+        message.append(String.format("- %s\n", (s.length() > 50) ? s.substring(0, 50) + "..." : s));
       }
       message.append(String.format("\n%s", compareUrl));
 
+      return message.toString();
     }
 
-    return message.toString();
+    return null;
   }
 
   @Override
