@@ -1,0 +1,10 @@
+language: groovy
+jdk:
+  - openjdk6
+  - oraclejdk7
+  - oraclejdk8
+script: mvn clean test
+branches:
+  only:
+    - master
+
