@@ -7,4 +7,6 @@ script: mvn clean test
 branches:
   only:
     - master
-
+matrix:
+  allow_failures:
+   - jdk: oraclejdk8
