@@ -11,12 +11,14 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.util.VariableResolver;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChatworkPublisher extends Publisher {
 
@@ -25,8 +27,9 @@ public class ChatworkPublisher extends Publisher {
 
   private Boolean notifyOnSuccess;
   private Boolean notifyOnFail;
-  private static final Pattern pattern = Pattern.compile("\\$\\{(.+)\\}|\\$(.+)\\s?");
   private AbstractBuild build;
+  private BuildListener listener;
+
 
   // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
   @DataBoundConstructor
@@ -58,9 +61,8 @@ public class ChatworkPublisher extends Publisher {
 
   @Override
   public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
-
-    Boolean result = true;
     this.build = build;
+    this.listener = listener;
     
     if(this.build.getResult() == Result.SUCCESS && !this.notifyOnSuccess) {
       return true;
@@ -68,50 +70,64 @@ public class ChatworkPublisher extends Publisher {
     if(this.build.getResult() == Result.FAILURE && !this.notifyOnFail) {
       return true;
     }
-    try {
 
+    try {
       String message = createMessage();
+
+      println("[ChatWork post message]");
+      println(message);
 
       if (message == null) return false;
 
       ChatworkClient chatworkClient = new ChatworkClient(build, getDescriptor().getApikey(), getRid(), getDefaultMessage());
       chatworkClient.sendMessage(message);
+
+      return true;
     } catch (Exception e) {
-      result = false;
-      listener.getLogger().println(e.getMessage());
+      e.printStackTrace(listener.getLogger());
+      return false;
     }
-    return result;
+  }
+
+  // print to build console
+  private void println(String message) {
+    this.listener.getLogger().println(message);
   }
 
   private String createMessage() throws Exception {
     String message = this.defaultMessage;
-    Matcher m = pattern.matcher(message);
-    while (m.find()) {
-      // If ${VARNAME} match found, return that group, else return $NoWhiteSpace group
-      String matches = (m.group(1) != null) ? m.group(1) : m.group(2);
 
-      String globalValue = getValue(matches);
-      if (globalValue != null) {
-        message = message.replaceAll(matches, globalValue);
-      }
-    }
-    return message;
-
-  }
-
-  private String getValue(String key) {
-    if (key == null) {
+    if(StringUtils.isBlank(message)){
       return null;
-    } else {
-      VariableResolver buildVariableResolver = build.getBuildVariableResolver();
-      Object defaultValue = buildVariableResolver.resolve(key);
-      return (defaultValue == null) ? "" : ("payload".equals(key)) ? analyzePayload(defaultValue.toString()) : defaultValue.toString();
     }
+
+    Map<String, String> extraVariables = createExtraVariables();
+    return BuildVariableUtil.resolve(message, build, listener, extraVariables);
   }
 
-  private static String analyzePayload(String parameterDefinition) {
+  private Map<String, String> createExtraVariables() {
+    Map<String, String> variables = new HashMap<String, String>();
 
-    JSONObject json = JSONObject.fromObject(parameterDefinition);
+    VariableResolver<String> buildVariableResolver = build.getBuildVariableResolver();
+    String payloadJson = buildVariableResolver.resolve("payload");
+    if(StringUtils.isNotBlank(payloadJson)){
+      variables.put("PAYLOAD_SUMMARY", analyzePayload(payloadJson));
+    }
+
+    variables.put("BUILD_RESULT", build.getResult().toString());
+
+    return variables;
+  }
+
+  private static String analyzePayload(String payloadJson) {
+    JSONObject json;
+    try{
+      json = JSONObject.fromObject(payloadJson);
+
+    } catch (JSONException e){
+      // payloadJson is not json
+      return payloadJson;
+    }
 
     if (json.has("action") && "opened".equals(json.getString("action"))) {
       JSONObject pullRequest = json.getJSONObject("pull_request");
