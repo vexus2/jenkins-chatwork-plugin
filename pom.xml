@@ -9,7 +9,7 @@
     <artifactId>chatwork</artifactId>
     <name>ChatWork Plugin</name>
     <description>This Plugin will notify the ChatWork any message.</description>
-    <version>0.4</version>
+    <version>0.5</version>
     <packaging>hpi</packaging>
     <url>https://wiki.jenkins-ci.org/display/JENKINS/ChatWork+Plugin</url>
 
