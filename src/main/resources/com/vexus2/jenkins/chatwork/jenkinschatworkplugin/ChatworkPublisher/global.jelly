@@ -16,6 +16,14 @@
       description="Set your Chatwork API Key">
       <f:textbox />
     </f:entry>
+    <f:entry title="Proxy server" field="proxysv"
+      description="Set your Proxy server">
+      <f:textbox default="NOPROXY"/>
+    </f:entry>
+    <f:entry title="Proxy port" field="proxyport"
+      description="Set your Proxy port">
+      <f:textbox />
+    </f:entry>
       <!--TODO: relation GitHub User <-> Chatwork ID-->
   </f:section>
 </j:jelly>

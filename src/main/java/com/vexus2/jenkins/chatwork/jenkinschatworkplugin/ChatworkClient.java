@@ -8,10 +8,16 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.Proxy;
+import java.net.InetSocketAddress;
+import java.lang.Integer;
 
 public class ChatworkClient {
 
   private final String apiKey;
+
+  private final String proxySv;
+  private final String proxyPort;
 
   private final String channelId;
 
@@ -21,9 +27,11 @@ public class ChatworkClient {
 
   private static final String API_URL = "https://api.chatwork.com/v1";
 
-  public ChatworkClient(AbstractBuild build, String apiKey, String channelId, String defaultMessage) {
+  public ChatworkClient(AbstractBuild build, String apiKey, String proxySv, String proxyPort, String channelId, String defaultMessage) {
     this.build = build;
     this.apiKey = apiKey;
+    this.proxySv = proxySv;
+    this.proxyPort = proxyPort;
     this.channelId = channelId;
     this.defaultMessage = defaultMessage;
   }
@@ -35,7 +43,15 @@ public class ChatworkClient {
 
     String url = API_URL + "/rooms/" + this.channelId + "/messages";
     URL obj = new URL(url);
-    HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+    HttpsURLConnection con;
+
+    if (this.proxySv == "NOPROXY") {
+      con = (HttpsURLConnection) obj.openConnection();
+    }
+    else {
+      Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this.proxySv, Integer.parseInt(this.proxyPort)));
+      con = (HttpsURLConnection) obj.openConnection(proxy);
+    }
 
     con.setRequestMethod("POST");
     con.setRequestProperty("X-ChatWorkToken", this.apiKey);
@@ -83,4 +99,3 @@ public class ChatworkClient {
 
 
 }
-
