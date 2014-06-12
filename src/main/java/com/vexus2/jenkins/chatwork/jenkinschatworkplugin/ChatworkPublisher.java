@@ -79,7 +79,7 @@ public class ChatworkPublisher extends Publisher {
 
       if (message == null) return false;
 
-      ChatworkClient chatworkClient = new ChatworkClient(build, getDescriptor().getApikey(), getRid(), getDefaultMessage());
+      ChatworkClient chatworkClient = new ChatworkClient(build, getDescriptor().getApikey(), getDescriptor().getProxysv(), getDescriptor().getProxyport(), getRid(), getDefaultMessage());
       chatworkClient.sendMessage(message);
 
       return true;
@@ -192,6 +192,18 @@ public class ChatworkPublisher extends Publisher {
       return apikey;
     }
 
+    private String proxysv;
+
+    public String getProxysv() {
+      return proxysv;
+    }
+
+    private String proxyport;
+
+    public String getProxyport() {
+      return proxyport;
+    }
+
     public DescriptorImpl() {
       load();
     }
@@ -207,9 +219,10 @@ public class ChatworkPublisher extends Publisher {
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
       apikey = formData.getString("apikey");
+      proxysv = formData.getString("proxysv");
+      proxyport = formData.getString("proxyport");
       save();
       return super.configure(req, formData);
     }
   }
 }
-

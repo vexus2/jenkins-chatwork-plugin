@@ -28,9 +28,11 @@ class ChatworkClientTest {
     void setUp(){
       AbstractBuild build = mock(AbstractBuild)
       String apiKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      String proxySv = "NOPROXY"
+      String proxyPort = "80"
       String channelId = "00000000"
       String defaultMessage = "defaultMessage"
-      client = new ChatworkClient(build, apiKey, channelId, defaultMessage)
+      client = new ChatworkClient(build, apiKey, proxySv, proxyPort, channelId, defaultMessage)
     }
 
     @Betamax(tape=ChatworkClientTest.TAPE_NAME, mode = TapeMode.READ_ONLY, match = [MatchRule.host, MatchRule.path])
