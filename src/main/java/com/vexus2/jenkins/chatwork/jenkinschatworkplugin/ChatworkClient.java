@@ -45,7 +45,7 @@ public class ChatworkClient {
     URL obj = new URL(url);
     HttpsURLConnection con;
 
-    if (this.proxySv == "NOPROXY") {
+    if (this.proxySv.equals("NOPROXY")) {
       con = (HttpsURLConnection) obj.openConnection();
     }
     else {
