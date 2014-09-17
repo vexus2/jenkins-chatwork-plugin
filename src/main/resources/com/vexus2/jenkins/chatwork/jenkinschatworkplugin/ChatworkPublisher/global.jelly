@@ -19,6 +19,7 @@
     <f:entry title="Proxy server" field="proxysv"
       description="Set your Proxy server">
       <f:textbox default="NOPROXY"/>
+      If you don't want to use proxy, set "NOPROXY"
     </f:entry>
     <f:entry title="Proxy port" field="proxyport"
       description="Set your Proxy port">
