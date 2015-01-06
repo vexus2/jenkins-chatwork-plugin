@@ -27,8 +27,8 @@ public class ChatworkPublisher extends Publisher {
 
   private Boolean notifyOnSuccess;
   private Boolean notifyOnFail;
-  private AbstractBuild build;
-  private BuildListener listener;
+  private transient AbstractBuild build;
+  private transient BuildListener listener;
 
 
   // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
